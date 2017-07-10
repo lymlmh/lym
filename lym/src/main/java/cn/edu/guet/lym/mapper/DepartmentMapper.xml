@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.guet.lym.mapper.DepartmentMapper">
+	
+	
+	<select id="selectByUserid" resultType="cn.edu.guet.lym.domain.Department">
+		select d.id,d.name,d.parentid,d.d_order as sequence
+		from Department d LEFT JOIN dept_employee de on de.dept_id=d.id
+		where de.employee_userid=#{userid}
+	</select>
+	<select id="selectAll" resultType="cn.edu.guet.lym.domain.Department">
+		select d.id,d.name,d.parentid,d.d_order as sequence
+		from Department d 
+		<where>
+			<if test="id!=null">
+				AND d.id != #{id}
+			</if>
+		</where>
+		order by sequence
+	</select>
+	<select id="get" resultType="cn.edu.guet.lym.domain.Department">
+		select d.id,d.name,d.parentid,d.d_order as sequence
+		from Department d
+		where id=#{id}
+	</select>
+	
+	<insert id="save" parameterType="cn.edu.guet.lym.domain.Department">
+		insert into Department(id,name,parentid,d_order)
+		values(#{id},#{name},#{parentid},#{sequence})
+	</insert>	
+	
+	
+	<update id="update" parameterType="cn.edu.guet.lym.domain.Department">
+	update Department set
+		name=#{name},
+		parentid=#{parentid}
+	where id=#{id}
+	</update>
+	
+	<delete id="delete">
+		delete from Department where id=#{id}
+	</delete>
+	
+		<select id="search" resultType="cn.edu.guet.lym.domain.Department">
+		select d.id,d.name,d.parentid,d.d_order
+		from Department d
+		where name like concat('%',#{search},'%')
+
+	</select>
+	
+</mapper>

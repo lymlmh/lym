@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.guet.lym.mapper.RoleMapper">
+	<resultMap type="cn.edu.guet.lym.domain.Role" id="baseResult">
+		<id column="id" property="id" jdbcType="BIGINT"/>
+		<result column="name" property="name"/>
+		
+		<association property="user" column="userid" javaType="Employee" columnPrefix="user_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+    		<result column="userid" property="userid"/>
+		</association>
+		<association property="dept" column="dept_id" javaType="Department" columnPrefix="dept_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+		</association>
+	</resultMap>
+ 	<resultMap type="cn.edu.guet.lym.domain.Type1" id="type1">
+	<result column="id" property="id"/>
+	<result column="name" property="name"/>
+	</resultMap> 
+	
+	 <resultMap type="cn.edu.guet.lym.domain.Place" id="place">
+	<result column="id" property="id"/>
+	<result column="name" property="name"/>
+	</resultMap>
+	<resultMap type="cn.edu.guet.lym.domain.Login" id="login">
+	<result column="id" property="id"/>
+	<result column="name" property="name"/>
+	<result column="pass" property="pass"/>
+	</resultMap>
+
+	<sql id="baseColumn">
+		r.id,r.name,e.name as user_name,e.userid as user_userid,
+		d.id as dept_id,d.name as dept_name
+	</sql>
+	
+	<select id="getRole" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from role r left join employee e on r.userid=e.userid
+		left join department d on r.dept_id=d.id
+		where e.userid=#{userid}
+	</select>
+	<select id="selectAllRole" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from role r left join employee e on r.userid=e.userid
+		left join department d on r.dept_id=d.id
+	</select>
+	
+	<insert id="save" parameterType="cn.edu.guet.lym.domain.Role">
+		insert into role(name,userid,dept_id) 
+		values(#{name},#{user.userid},#{dept.id})
+	</insert>
+	
+	<insert id="updateplace" parameterType="cn.edu.guet.lym.domain.Place">
+		insert into place(name) 
+		values(#{name})
+	</insert>
+	
+	<delete id="delete">
+		delete from role where id=#{id}
+	</delete>
+	
+	<delete id="deleteplace">
+		delete from place where id=#{id}
+	</delete>
+	
+    <select id="get" resultType="cn.edu.guet.lym.domain.Role">
+		select d.id,d.name,d.userid as sequence 
+		from role d
+		where d.id=#{id}
+	</select>
+	
+	 <select id="getemp" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from role r left join employee e on r.userid=e.userid
+		left join department d on r.dept_id=d.id
+		where r.dept_id=#{deptid}
+	</select>
+	
+	  <select id="searchtype" resultMap="type1">
+		select *
+		from type
+	</select>
+	
+   <select id="searchplace" resultMap="place">
+		select *
+		from place
+	</select>
+	
+		<select id="search" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+	    from role r left join employee e on r.userid=e.userid
+		left join department d on r.dept_id=d.id
+		<where>
+			<if test="_parameter != null">
+				AND r.name like concat('%',#{_parameter},'%')
+			</if>
+		</where>
+	</select>
+	<select id="searchlogin" resultMap="login">
+		select *
+		from login
+		where name=#{name}
+	</select>
+	
+</mapper>

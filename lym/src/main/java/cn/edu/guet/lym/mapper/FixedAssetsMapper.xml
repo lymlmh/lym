@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.guet.lym.mapper.FixedAssetsMapper">
+	<resultMap type="cn.edu.guet.lym.domain.FixedAssets" id="baseResult">
+		<id column="id" property="id" jdbcType="BIGINT"/>
+		<result column="name" property="name"/>
+		<result column="info" property="info"/>
+		<result column="type" property="type"/>
+		<result column="code" property="code"/>
+		<result column="status" property="status"/>
+		<result column="inTime" property="inTime"/>
+		<result column="scrapTime" property="scrapTime"/>
+		<result column="codePath" property="codePath"/>
+		<result column="oldUserid" property="oldUserid"/>
+		<result column="oldDeptid" property="oldDeptid"/>
+		<result column="price" property="price"/>
+		<result column="place" property="place"/>
+		<result column="pandian" property="pandian"/>
+		
+		<association property="user" column="employee_id" javaType="Employee" columnPrefix="user_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+    		<result column="userid" property="userid"/>
+		</association>
+		<association property="dept" column="dept_id" javaType="Department" columnPrefix="dept_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+		</association>
+		<association property="type1" column="type" javaType="Type1" columnPrefix="type1_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+		</association>
+		<collection property="flows" select="cn.edu.guet.lym.mapper.AssetsFlowMapper.selectByAssetsId" 
+		ofType="cn.edu.guet.lym.domain.AssetsFlow" column="id"/>
+	</resultMap>
+
+	<sql id="baseColumn">
+		fa.id,fa.name,fa.info,fa.type,fa.inTime,fa.status,fa.scrapTime,fa.pandian,
+		fa.code,fa.codePath,fa.oldUserid,fa.oldDeptid,fa.price,fa.place,
+		e.name as user_name,e.userid as user_userid,t.id as type1_id,t.name as type1_name,
+		d.id as dept_id,d.name as dept_name
+	</sql>
+	
+	<select id="getAssetsInfo" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+		where fa.id=#{id}
+	</select>
+	<select id="getAssetsInfoByCurUser" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+		where fa.employee_id=#{userid}
+	</select>
+	<select id="getAssetsInfoByDeptId" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+		<!-- where fa.dept_id=#{deptId} -->
+		<where>
+			<if test="_parameter != null">
+				AND fa.dept_id=#{_parameter}
+			</if>
+		</where>
+	</select>
+	
+	<select id="seearchall" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+	</select>
+	
+	<select id="get" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+		where fa.id=#{id}
+	</select>
+	<select id="search" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id
+		<where>
+			<if test="_parameter!=null and _parameter!=''"> 
+			AND d.name like concat('%',#{_parameter},'%') or 
+			fa.name like concat('%',#{_parameter},'%') or 
+			e.name like concat('%',#{_parameter},'%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="searchbyuser" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from fixedAssets fa left join employee e on fa.employee_id=e.userid
+		left join department d on fa.dept_id=d.id
+		left join type t on fa.type=t.id 
+		where fixedAssets.userid=#{userid} AND fa.name like concat('%',#{search},'%') 
+			
+	</select>
+	
+	<insert id="save" parameterType="cn.edu.guet.lym.domain.FixedAssets">
+	insert into fixedAssets(name,info,type,inTime,employee_id,dept_id,status,code,price,place,pandian)
+	values(#{name},#{info},#{type},now(),#{user.userid},
+	#{dept.id},#{status},#{code},#{price},#{place},#{pandian})
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id" >
+	       SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	
+	<update id="update" parameterType="cn.edu.guet.lym.domain.FixedAssets">
+		update fixedAssets set
+		name=#{name},
+		info=#{info},
+		scrapTime=#{scrapTime},
+		codePath=#{codePath},
+		status=#{status},
+		employee_id=#{user.userid},
+		dept_id=#{dept.id},
+ 		oldUserid=#{oldUserid},
+ 		pandian=#{pandian},
+ 		place=#{place},
+		oldDeptid=#{oldDeptid} 
+		where id=#{id}
+	</update>
+	
+	<update id="updatepandian" parameterType="cn.edu.guet.lym.domain.FixedAssets">
+		update fixedAssets set
+ 		pandian=#{pandian}
+		where id=#{id}
+	</update>
+	
+	<update id="clean" parameterType="cn.edu.guet.lym.domain.FixedAssets">
+		update fixedAssets set
+ 		pandian=#{pandian}
+	</update>
+</mapper>

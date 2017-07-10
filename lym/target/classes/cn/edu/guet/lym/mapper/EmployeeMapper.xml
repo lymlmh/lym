@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.guet.lym.mapper.EmployeeMapper">
+<resultMap type="cn.edu.guet.lym.domain.Employee" id="baseResult">
+		<id column="id" property="id" jdbcType="BIGINT"/>
+		<result column="name" property="name"/>
+		<result column="userid" property="userid"/>
+		<result column="gender" property="gender"/>
+		<result column="weixinid" property="weixinid"/>
+		<result column="mobile" property="mobile"/>
+		<result column="email" property="email"/>
+		<result column="deptName" property="deptName"/>
+		<result column="label" property="label"/>
+		<result column="position" property="position"/>
+		<result column="deptId" property="deptId"/>
+		<result column="avatar" property="avatar"/>
+		<result column="status" property="status"/>
+		<result column="ifbumen" property="ifbumen"/>
+		<result column="ifrenyuan" property="ifrenyuan"/>
+		<result column="partid" property="partid"/>
+		<association property="quanxian" column="partid" javaType="Quanxian" columnPrefix="part_">
+			<id column="id"  property="id"/>
+    		<result column="name" property="name"/>
+    		<result column="ifbumen" property="ifbumen"/>
+    		<result column="ifrenyuan" property="ifrenyuan"/>
+    		<result column="ifdidian" property="ifdidian"/>
+    		<result column="ifquanxian" property="ifquanxian"/>
+    		<result column="ifjuese" property="ifjuese"/>
+		</association>
+	</resultMap>
+	<sql id="baseColumn">
+		e.id,e.name,e.userid,e.gender,e.weixinid,e.mobile,e.email,e.deptName,
+		e.label,e.position,e.deptId,e.avatar,e.status,e.ifbumen,e.ifrenyuan,e.partid,q.id as part_id,
+		q.name as part_name,q.ifbumen as part_ifbumen,q.ifrenyuan as part_ifrenyuan,q.ifdidian as part_ifdidian,
+		q.ifquanxian as part_ifquanxian,q.ifjuese as part_ifjuese
+	</sql>
+	
+	
+	<select id="selectAllEmployees" resultType="cn.edu.guet.lym.domain.Employee">
+		select e.id,e.name,e.userid,e.gender,e.weixinid,e.mobile,e.email,
+				d.name,e.label,e.position,e.deptId,e.avatar,e.status,e.deptName
+		from Employee e LEFT JOIN Department d on e.deptId=d.id
+	</select>
+	<select id="getItem" resultType="cn.edu.guet.lym.domain.Employee">
+		select e.id,e.name,e.userid,e.gender,e.weixinid,e.mobile,e.email,
+				e.label,e.position,e.avatar,e.status,e.deptName,e.deptId,e.ifbumen,e.ifrenyuan,e.partid
+		from Employee e
+		where userid=#{userid}
+	</select>
+	<select id="search" resultType="cn.edu.guet.lym.domain.Employee">
+		select e.id,e.name,e.userid,e.gender,e.weixinid,e.mobile,e.email,
+				e.label,e.position,e.avatar,e.status,e.ifbumen,e.ifrenyuan,e.partid
+		from Employee e
+		where name like concat('%',#{search},'%') or 
+			mobile like concat('%',#{search},'%') or 
+			weixinid like concat('%',#{search},'%')
+	</select>
+	
+	
+	<insert id="save" parameterType="cn.edu.guet.lym.domain.Employee">
+		insert into Employee(userid,name,position,mobile,gender,email,weixinid,avatar,status,deptName,deptId)
+		values(#{userid},#{name},#{position},#{mobile},#{gender},#{email},
+		#{weixinid},#{avatar},#{status},#{deptName},#{deptId})
+		
+	</insert>	
+	<insert id="saveDept">
+		insert into dept_employee(dept_id,employee_userid)
+		values(#{deptId},#{userid})
+	</insert>
+	
+	<update id="update" parameterType="cn.edu.guet.lym.domain.Employee">
+	update  Employee set
+		name=#{name},
+		position=#{position},
+		mobile=#{mobile},
+		gender=#{gender},
+		email=#{email},
+		weixinid=#{weixinid},
+		avatar=#{avatar},
+		status=#{status},
+		deptName=#{deptName},
+		deptId=#{deptId},
+		label=#{label}
+	where userid=#{userid}
+	</update>
+	
+	<update id="updaterole" parameterType="cn.edu.guet.lym.domain.Employee">
+	update  Employee set
+		ifbumen=#{ifbumen},
+		ifrenyuan=#{ifrenyuan}
+	where userid=#{userid}
+	</update>
+	<update id="updatepart" parameterType="cn.edu.guet.lym.domain.Employee">
+	update  Employee set
+		partid=#{partid}
+	where userid=#{userid}
+	</update>
+	
+		<delete id="delete">
+		delete from Employee where userid=#{userid}
+	</delete>
+	<select id="selectall" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from employee e left join quanxian q on e.partid=q.id
+		<!-- where e.userid=#{id} -->
+	</select>
+	<select id="selectbyuserid" resultMap="baseResult">
+		select <include refid="baseColumn"/>
+		from employee e left join quanxian q on e.partid=q.id
+		where e.userid=#{userid}
+	</select>
+</mapper>

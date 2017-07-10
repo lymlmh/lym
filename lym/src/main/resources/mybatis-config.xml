@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  <!-- 环境 -->
+  <configuration>
+  
+  <!-- 配置延迟加载 -->
+  <settings>
+  <!-- 启用延迟加载,默认是false -->
+  	<setting name="lazyLoadingEnabled" value="true"/>
+  	<!-- 按需加载 -->
+  	<setting name="aggressiveLazyLoading" value="false"/>
+  	<!-- 默认会延迟加载的方法，equals,clone,hashCode,toString -->
+  	<setting name="lazyLoadTriggerMethods" value="clone"/>
+  </settings>
+  
+  </configuration>
