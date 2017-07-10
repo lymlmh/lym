@@ -56,7 +56,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 <script src="js/lib/jquery-2.1.4.js"></script>
 <script src="js/lib/fastclick.js"></script>
-<title>找不到网页sf</title>
+<title>找不到网页</title>
 </head>
 <body>
 	<div class="container" align="center" style=" margin-top: 50px;margin-left: 50px;">
