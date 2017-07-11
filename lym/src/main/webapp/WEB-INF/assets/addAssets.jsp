@@ -84,7 +84,7 @@ function func(){
 </script>
 <title>新增资产信息</title>
 </head>
-<body ontouchstart>
+<body >
      <header class='demos-header'>
       <h1 class="demos-title">新增资产</h1>
     </header>

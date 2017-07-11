@@ -47,6 +47,7 @@ $("#login").click(function(){
 		data:{name:name,pass:pass},
 		success:function(data){
 			if(data.success){
+				//alert("登录成功");
 				$.modal({
 			          title: "提示",
 			          text: "登录成功",
